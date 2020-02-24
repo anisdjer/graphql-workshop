@@ -1,17 +1,18 @@
 # graphql workshop
 
-## 1. setup
+## 1. [setup](./docs/1-setup.md)
+## 2. server
 
-- npm dependencies
+- We will use `express` to create a server.
+
 ```shell
-npm install graphql --save
+npm install express express-graphql graphql --save
 ```
 
-- minimal setup
-
-
 ```js
-var { graphql, buildSchema } = require('graphql');
+var express = require('express');
+var graphqlHTTP = require('express-graphql');
+var { buildSchema } = require('graphql');
 
 // Construct a schema, using GraphQL schema language
 var schema = buildSchema(`
@@ -27,11 +28,30 @@ var root = {
   },
 };
 
-// Run the GraphQL query '{ hello }' and print out the response
-graphql(schema, '{ hello }', root).then((response) => {
-  console.log(response);
-});
-
+var app = express();
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true,
+}));
+app.listen(4000);
+console.log('Running a GraphQL API server at http://localhost:4000/graphql');
 ```
 
-> This is not a running server, this just runs a graphQL query on nodejs.
+> `http://localhost:4000/graphql`
+
+> *query*
+> ```js
+> {
+>   hello
+> }
+> ```
+> 
+> *response*
+> ```json
+> {
+>   "data": {
+>     "hello": "Hello world!"
+>   }
+> }
+> ```
